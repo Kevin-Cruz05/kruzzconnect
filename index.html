@@ -1,0 +1,566 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="KruzzConnect: a Human Systems Engineering case study by Kevin Cruz. An AI job-search platform that keeps the human in control.">
+<style>body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>KruzzConnect Case Study</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Public+Sans:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+:root{
+  --ground:#F3F5F8; --surface:#FFFFFF; --ink:#16213A; --ink-2:#4A5570; --ink-3:#7A849B;
+  --line:#DCE1EA; --accent:#1F5FD1; --accent-soft:#E3ECFB;
+  --yes:#12795E; --yes-soft:#DDF1EA; --part:#A2660C; --part-soft:#F8ECD6; --no:#B03A3A; --no-soft:#F7E1E1;
+  --shadow:0 18px 40px -18px rgba(22,33,58,.35);
+  --display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --body:"Public Sans", "Segoe UI", system-ui, sans-serif;
+  --mono:"JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --ground:#0E1422; --surface:#172035; --ink:#E8ECF5; --ink-2:#AEB7CB; --ink-3:#7E89A3;
+    --line:#29344D; --accent:#7AA7F5; --accent-soft:#1D2D4E;
+    --yes:#4CC79F; --yes-soft:#133A30; --part:#E0A64A; --part-soft:#3B2E17; --no:#EE7C7C; --no-soft:#3E1F24;
+    --shadow:0 18px 40px -18px rgba(0,0,0,.7);
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --ground:#0E1422; --surface:#172035; --ink:#E8ECF5; --ink-2:#AEB7CB; --ink-3:#7E89A3;
+  --line:#29344D; --accent:#7AA7F5; --accent-soft:#1D2D4E;
+  --yes:#4CC79F; --yes-soft:#133A30; --part:#E0A64A; --part-soft:#3B2E17; --no:#EE7C7C; --no-soft:#3E1F24;
+  --shadow:0 18px 40px -18px rgba(0,0,0,.7);
+}
+*{box-sizing:border-box}
+body{background:var(--ground);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.6;padding-inline:20px;padding-block:0 64px}
+.wrap{max-width:1080px;margin:0 auto}
+h1,h2,h3{font-family:var(--display);line-height:1.1;text-wrap:balance;margin:0}
+h1{font-size:clamp(2.6rem,6vw,4.4rem);font-weight:800;letter-spacing:-.02em}
+h2{font-size:clamp(1.7rem,3.4vw,2.3rem);font-weight:700;letter-spacing:-.01em}
+h3{font-size:1.15rem;font-weight:700}
+p{margin:0;max-width:65ch}
+.eyebrow{font-family:var(--mono);font-size:.74rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3)}
+.muted{color:var(--ink-2)}
+a{color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:4px}
+
+/* top */
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding-block:22px;border-bottom:1px solid var(--line)}
+.brand{font-family:var(--display);font-weight:800;font-size:1.2rem;letter-spacing:-.01em}
+.brand span{color:var(--accent)}
+.status{font-family:var(--mono);font-size:.75rem;padding:5px 10px;border:1px solid var(--line);border-radius:999px;color:var(--ink-2);background:var(--surface)}
+.status b{color:var(--part);font-weight:600}
+
+/* hero */
+.hero{display:grid;grid-template-columns:1.15fr .85fr;gap:48px;align-items:center;padding-block:56px 40px}
+.hero .lede{font-size:1.18rem;color:var(--ink-2);margin-top:20px}
+.tagline{font-family:var(--display);font-weight:500;font-size:1.3rem;margin-top:22px;color:var(--accent)}
+.meta{display:grid;grid-template-columns:repeat(3,auto);gap:8px 28px;margin-top:30px;justify-content:start}
+.meta dt{font-family:var(--mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
+.meta dd{margin:0;font-weight:600;font-size:.95rem}
+
+/* swipe demo */
+.demo{display:flex;flex-direction:column;align-items:center;gap:14px}
+.deck{position:relative;width:100%;max-width:360px;height:470px}
+.card{position:absolute;inset:0;background:var(--surface);border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow);padding:22px;display:flex;flex-direction:column;gap:14px;touch-action:pan-y;user-select:none;cursor:grab;transition:transform .35s ease,opacity .35s ease}
+.card.behind{transform:scale(.95) translateY(14px);opacity:.6;pointer-events:none}
+.card.dragging{transition:none;cursor:grabbing}
+.card-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+.role{font-family:var(--display);font-weight:700;font-size:1.3rem;line-height:1.15}
+.co{color:var(--ink-2);font-size:.9rem;margin-top:2px}
+.ring{flex:none;width:74px;height:74px;position:relative}
+.ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.ring .num{position:absolute;inset:0;display:grid;place-items:center;font-family:var(--mono);font-weight:600;font-size:1.05rem}
+.ring .lbl{position:absolute;bottom:-14px;left:0;right:0;text-align:center;font-family:var(--mono);font-size:.58rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)}
+.facts{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font-size:.78rem;padding:3px 9px;border-radius:999px;background:var(--accent-soft);color:var(--ink);font-weight:500}
+.reqs{list-style:none;margin:0;padding:0;display:grid;gap:5px;font-size:.86rem}
+.reqs li{display:flex;justify-content:space-between;gap:10px;align-items:center}
+.tag{font-family:var(--mono);font-size:.66rem;font-weight:600;padding:2px 7px;border-radius:5px;letter-spacing:.04em}
+.t-yes{background:var(--yes-soft);color:var(--yes)} .t-part{background:var(--part-soft);color:var(--part)} .t-no{background:var(--no-soft);color:var(--no)}
+.why{margin-top:auto;font-size:.8rem;color:var(--ink-2);border-top:1px dashed var(--line);padding-top:10px}
+.stamp{position:absolute;top:26px;font-family:var(--display);font-weight:800;font-size:1.5rem;padding:2px 12px;border:3px solid;border-radius:8px;opacity:0;pointer-events:none}
+.stamp.apply{left:22px;color:var(--yes);transform:rotate(-12deg)}
+.stamp.pass{right:22px;color:var(--no);transform:rotate(12deg)}
+.controls{display:flex;gap:12px}
+.btn{font-family:var(--body);font-weight:600;font-size:.9rem;padding:10px 18px;border-radius:999px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.btn:hover{border-color:var(--ink-3)}
+.btn.pass{color:var(--no)} .btn.apply{background:var(--yes);border-color:var(--yes);color:var(--surface)}
+.toast{font-size:.85rem;color:var(--ink-2);min-height:2.6em;text-align:center;max-width:340px}
+.sample-note{font-family:var(--mono);font-size:.68rem;color:var(--ink-3);letter-spacing:.04em}
+.done{position:absolute;inset:0;display:grid;place-items:center;text-align:center;border:1.5px dashed var(--line);border-radius:22px;padding:24px;color:var(--ink-2)}
+
+/* sections */
+section{padding-block:56px;border-top:1px solid var(--line)}
+.sec-head{display:grid;grid-template-columns:220px 1fr;gap:32px;margin-bottom:30px}
+.sec-head .eyebrow{padding-top:8px}
+.sec-head p{margin-top:12px;color:var(--ink-2)}
+.body-grid{display:grid;grid-template-columns:220px 1fr;gap:32px}
+.body-grid > :first-child{min-width:0}
+.col{min-width:0}
+
+.question{font-family:var(--display);font-weight:500;font-size:clamp(1.3rem,2.6vw,1.75rem);line-height:1.3;max-width:34ch;border-left:3px solid var(--accent);padding-left:20px}
+.principles{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-top:34px;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--surface)}
+.principles div{padding:18px;border-right:1px solid var(--line)}
+.principles div:last-child{border-right:0}
+.principles .who{font-family:var(--mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
+.principles .what{font-family:var(--display);font-weight:700;font-size:1.05rem;margin-top:6px}
+.principles div:last-child .who{color:var(--accent)}
+
+.rules{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.rule{padding:20px;border:1px solid var(--line);border-radius:14px;background:var(--surface)}
+.rule h3{margin-bottom:8px}
+.rule p{font-size:.93rem;color:var(--ink-2)}
+
+/* evidence ledger */
+.ledger{background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.ledger-row{display:grid;grid-template-columns:170px 120px 1fr;gap:16px;padding:14px 18px;border-top:1px solid var(--line);font-size:.92rem;align-items:baseline}
+.ledger-row:first-child{border-top:0;font-family:var(--mono);font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
+.ledger-row .skill{font-weight:600}
+.ledger-row .lvl{font-family:var(--mono);font-size:.8rem;color:var(--ink-2)}
+.ledger-row ul{margin:0;padding-left:18px;color:var(--ink-2)}
+.ledger-foot{font-size:.85rem;color:var(--ink-3);margin-top:12px}
+
+/* weights chart */
+.weights{display:grid;gap:10px}
+.w-row{display:grid;grid-template-columns:190px 1fr 48px;gap:14px;align-items:center;font-size:.92rem}
+.w-bar{height:14px;background:var(--accent-soft);border-radius:4px;overflow:hidden}
+.w-bar i{display:block;height:100%;background:var(--accent);border-radius:4px}
+.w-row .pct{font-family:var(--mono);font-variant-numeric:tabular-nums;text-align:right;font-weight:600}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:28px;margin-top:30px}
+.panel{padding:20px;border:1px solid var(--line);border-radius:14px;background:var(--surface)}
+.panel h3{margin-bottom:6px}
+.panel p,.panel li{font-size:.92rem;color:var(--ink-2)}
+.panel ul{margin:10px 0 0;padding-left:18px}
+
+/* flow */
+.flow{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(5,1fr);gap:0;counter-reset:s}
+.flow li{counter-increment:s;padding:16px 14px 16px 0;border-top:3px solid var(--line);position:relative;font-size:.88rem}
+.flow li::before{content:counter(s,decimal-leading-zero);display:block;font-family:var(--mono);font-size:.72rem;color:var(--ink-3);margin-bottom:6px}
+.flow li b{display:block;font-family:var(--display);font-size:1rem;margin-bottom:3px}
+.flow li span{color:var(--ink-2)}
+.flow li.ai{border-top-color:var(--accent)}
+.flow li.human{border-top-color:var(--yes)}
+.legend{display:flex;gap:18px;flex-wrap:wrap;margin-top:18px;font-size:.82rem;color:var(--ink-2)}
+.legend i{display:inline-block;width:18px;height:3px;vertical-align:middle;margin-right:6px}
+
+.review{margin-top:34px;max-width:560px;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px;box-shadow:var(--shadow)}
+.review .q{font-weight:600;margin-top:8px}
+.review .ans{display:flex;gap:10px;align-items:center;margin-top:10px;font-size:.92rem}
+.review .ev{margin-top:10px;font-size:.85rem;color:var(--ink-2);background:var(--ground);border-radius:8px;padding:10px 12px}
+.review .row{display:flex;gap:10px;margin-top:14px}
+
+/* automation */
+.levels{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.level{padding:20px;border:1px solid var(--line);border-radius:14px;background:var(--surface)}
+.level .meter{display:flex;gap:4px;margin:10px 0 12px}
+.level .meter i{flex:1;height:6px;border-radius:3px;background:var(--line)}
+.level .meter i.on{background:var(--accent)}
+.level ul{margin:0;padding-left:18px;font-size:.9rem;color:var(--ink-2)}
+.level .gate{margin-top:12px;font-family:var(--mono);font-size:.72rem;color:var(--yes)}
+
+/* roadmap */
+.road{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.ver{padding:20px;border:1px solid var(--line);border-radius:14px;background:var(--surface);display:flex;flex-direction:column;gap:8px}
+.ver .v{font-family:var(--mono);font-size:.72rem;color:var(--ink-3);letter-spacing:.08em}
+.ver ul{margin:0;padding-left:18px;font-size:.88rem;color:var(--ink-2)}
+.ver .st{margin-top:auto;font-family:var(--mono);font-size:.7rem;font-weight:600}
+.ver.next{border-color:var(--accent)}
+.ver.next .st{color:var(--accent)}
+.ver .st.later{color:var(--ink-3)}
+
+/* stack */
+.stack{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--surface)}
+.stack div{padding:18px;border-right:1px solid var(--line);border-bottom:1px solid var(--line)}
+.stack div:nth-child(3n){border-right:0}
+.stack div:nth-last-child(-n+3){border-bottom:0}
+.stack .k{font-family:var(--mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
+.stack .v{margin-top:6px;font-weight:600;font-size:.95rem}
+
+/* study */
+.measures{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.measure{padding:14px 16px;border:1px solid var(--line);border-radius:12px;background:var(--surface);font-size:.9rem;font-weight:500}
+.skills-shown{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px}
+.skills-shown span{font-size:.85rem;padding:6px 12px;border:1px solid var(--line);border-radius:999px;background:var(--surface)}
+
+/* log */
+.log{list-style:none;margin:0;padding:0;border-left:2px solid var(--line)}
+.log li{position:relative;padding:0 0 22px 22px}
+.log li::before{content:"";position:absolute;left:-7px;top:6px;width:12px;height:12px;border-radius:50%;background:var(--surface);border:2px solid var(--ink-3)}
+.log li.done-i::before{background:var(--yes);border-color:var(--yes)}
+.log .d{font-family:var(--mono);font-size:.75rem;color:var(--ink-3)}
+.log .t{font-weight:600}
+.log .s{font-size:.9rem;color:var(--ink-2)}
+
+footer{border-top:1px solid var(--line);padding-top:26px;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;font-size:.85rem;color:var(--ink-3)}
+
+@media (max-width:900px){
+  .hero{grid-template-columns:1fr;gap:36px}
+  .sec-head,.body-grid{grid-template-columns:1fr;gap:10px}
+  .principles{grid-template-columns:1fr 1fr}
+  .principles div:nth-child(2){border-right:0}
+  .principles div:nth-child(-n+2){border-bottom:1px solid var(--line)}
+  .rules,.levels{grid-template-columns:1fr}
+  .road{grid-template-columns:1fr 1fr}
+  .flow{grid-template-columns:1fr 1fr}
+  .measures{grid-template-columns:1fr 1fr}
+  .two{grid-template-columns:1fr}
+  .stack{grid-template-columns:1fr 1fr}
+  .stack div{border-right:1px solid var(--line)!important;border-bottom:1px solid var(--line)!important}
+  .stack div:nth-child(2n){border-right:0!important}
+}
+@media (max-width:560px){
+  .meta{grid-template-columns:1fr 1fr}
+  .road,.flow,.stack{grid-template-columns:1fr}
+  .stack div{border-right:0!important}
+  .ledger-row{grid-template-columns:1fr;gap:4px}
+  .ledger-row:first-child{display:none}
+  .w-row{grid-template-columns:1fr 44px;gap:6px 10px}
+  .w-row .w-bar{grid-column:1 / -1;grid-row:2}
+  .deck{height:500px}
+}
+@media (prefers-reduced-motion: reduce){ .card{transition:none} }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="top">
+    <div class="brand">Kruzz<span>Connect</span></div>
+    <div class="status">Status: <b>Concept &amp; product definition</b> · Sept 2026</div>
+  </header>
+
+  <div class="hero">
+    <div>
+      <div class="eyebrow">Human Systems Engineering · Human–AI Interaction case study</div>
+      <h1>AI does the searching. You make the call.</h1>
+      <p class="lede">KruzzConnect is a mobile-first platform where an AI agent finds jobs, explains how well you qualify, and prepares tailored applications — while every career decision, and every submission, stays with the person.</p>
+      <div class="tagline">Swipe. Match. Apply.</div>
+      <dl class="meta">
+        <div><dt>Designer</dt><dd>Kevin Cruz</dd></div>
+        <div><dt>Role</dt><dd>Product · UX · HF</dd></div>
+        <div><dt>Started</dt><dd>Sept 20, 2026</dd></div>
+      </dl>
+    </div>
+
+    <div class="demo" aria-label="Interactive job card prototype">
+      <div class="sample-note">SAMPLE JOBS · DRAG OR USE BUTTONS</div>
+      <div class="deck" id="deck"></div>
+      <div class="controls">
+        <button class="btn pass" id="b-pass" type="button">Pass</button>
+        <button class="btn" id="b-save" type="button">Save</button>
+        <button class="btn apply" id="b-apply" type="button">Apply</button>
+      </div>
+      <div class="toast" id="toast" role="status" aria-live="polite">Every score shows its reasons. Tap a card to see why.</div>
+    </div>
+  </div>
+
+  <section id="problem">
+    <div class="sec-head">
+      <div class="eyebrow">The problem</div>
+      <div>
+        <h2>Job searching is repetitive work wrapped around one important decision.</h2>
+        <p>Candidates spend hours scanning boards, rewriting the same resume, and re-typing their history into forms. The decision that matters — <em>is this job right for me?</em> — gets buried under the busywork. Fully automated "mass apply" tools solve the busywork by removing the person entirely. KruzzConnect takes the other path.</p>
+      </div>
+    </div>
+    <div class="body-grid">
+      <div class="eyebrow">Research question</div>
+      <div class="col">
+        <p class="question">How can we reduce the cognitive load, time, and frustration of modern job searching while maintaining meaningful human control over employment decisions?</p>
+        <div class="principles">
+          <div><div class="who">AI</div><div class="what">Finds the opportunities</div></div>
+          <div><div class="who">AI</div><div class="what">Prepares the application</div></div>
+          <div><div class="who">AI</div><div class="what">Explains its reasoning</div></div>
+          <div><div class="who">Human</div><div class="what">Stays in control</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="rules">
+    <div class="sec-head">
+      <div class="eyebrow">Design constraints</div>
+      <div>
+        <h2>Three rules the AI is never allowed to break.</h2>
+        <p>These were set before any screen was drawn. They shape the data model, the scoring, and the flow.</p>
+      </div>
+    </div>
+    <div class="rules">
+      <div class="rule"><h3>Never invent qualifications</h3><p>Every qualification the AI writes into a resume, cover letter, or form answer must trace back to evidence in the user's profile.</p></div>
+      <div class="rule"><h3>Always explain the score</h3><p>A match percentage is never shown alone. It comes with the strong matches, the gaps, and how each category was weighted.</p></div>
+      <div class="rule"><h3>Human approves every submission</h3><p>No application leaves the app without an explicit confirmation from the user — at every automation level, including Autopilot.</p></div>
+    </div>
+  </section>
+
+  <section id="profile">
+    <div class="sec-head">
+      <div class="eyebrow">Master Career Profile</div>
+      <div>
+        <h2>One profile, built on evidence instead of claims.</h2>
+        <p>Rather than juggling many resumes, the user maintains a single structured profile — a LinkedIn-style professional page with no feed, likes, posts or followers. Each skill stores the evidence behind it, which is what lets the matcher decide whether a requirement is actually supported.</p>
+      </div>
+    </div>
+    <div class="body-grid">
+      <div class="eyebrow">Evidence ledger (example)</div>
+      <div class="col">
+        <div class="ledger" role="table">
+          <div class="ledger-row" role="row"><span>Skill</span><span>Level</span><span>Evidence</span></div>
+          <div class="ledger-row" role="row"><span class="skill">SQL</span><span class="lvl">Intermediate</span><ul><li>Chicago Crime Dataset project</li><li>Coursework</li><li>SQL queries written</li></ul></div>
+          <div class="ledger-row" role="row"><span class="skill">Usability testing</span><span class="lvl">Experienced</span><ul><li>HCI coursework studies</li><li>Human Factors projects</li></ul></div>
+          <div class="ledger-row" role="row"><span class="skill">MATLAB</span><span class="lvl">—</span><ul><li>No evidence on file → reported as a gap, never claimed</li></ul></div>
+        </div>
+        <p class="ledger-foot">Profile sections: personal info, education, experience, projects, skills, certifications, portfolio, and career preferences (roles, industries, locations, salary, remote / hybrid / on-site).</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="score">
+    <div class="sec-head">
+      <div class="eyebrow">Match scoring</div>
+      <div>
+        <h2>An honest, app-specific score — not a fake ATS number.</h2>
+        <p>Companies use different applicant-tracking systems, so KruzzConnect never claims to predict one. Instead, each posting is parsed into structured requirements and compared against the profile, producing an <strong>Application Match Score</strong> with a visible weighting.</p>
+      </div>
+    </div>
+    <div class="body-grid">
+      <div class="eyebrow">Proposed weighting</div>
+      <div class="col">
+        <div class="weights" id="weights"></div>
+        <div class="two">
+          <div class="panel">
+            <h3>Qualification ≠ company fit</h3>
+            <p>Salary, location, work arrangement, industry, size and benefits are shown as facts beside the score, not folded into it. The AI informs; it doesn't decide whether a company is desirable.</p>
+          </div>
+          <div class="panel">
+            <h3>Separate: Resume ATS Compatibility</h3>
+            <p>A second score checks the tailored resume itself:</p>
+            <ul><li>Keyword coverage &amp; job-specific terms</li><li>Formatting and section structure</li><li>Readability</li></ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="flow">
+    <div class="sec-head">
+      <div class="eyebrow">Human-in-the-loop flow</div>
+      <div>
+        <h2>The agent prepares. The person verifies. Then, and only then, it submits.</h2>
+        <p>The prototype flow runs from profile to final confirmation. Steps the AI handles are marked in blue; steps that require the person are marked in green.</p>
+      </div>
+    </div>
+    <ol class="flow">
+      <li class="human"><b>Career profile</b><span>User uploads resume, verifies what the AI extracted</span></li>
+      <li class="ai"><b>Find jobs</b><span>Agent searches permitted sources</span></li>
+      <li class="ai"><b>Match analysis</b><span>Score, strengths and gaps explained</span></li>
+      <li class="human"><b>Swipe</b><span>Pass, save or apply</span></li>
+      <li class="ai"><b>Tailor</b><span>Resume and cover letter from profile evidence</span></li>
+      <li class="ai"><b>Prepare</b><span>Fields filled, questions drafted</span></li>
+      <li class="human"><b>Verify answers</b><span>Each answer shows its evidence; edit or confirm</span></li>
+      <li class="human"><b>Final review</b><span>Resume ✓ Letter ✓ Application ✓ Questions ✓</span></li>
+      <li class="human"><b>Submit</b><span>User presses the button, not the agent</span></li>
+      <li class="ai"><b>Learn</b><span>Suggests preference changes from swipes — asks first</span></li>
+    </ol>
+    <div class="legend"><span><i style="background:var(--accent)"></i>AI does the work</span><span><i style="background:var(--yes)"></i>Human decides</span></div>
+
+    <div class="review" aria-label="Review-before-submission example">
+      <div class="eyebrow">Review before submission · example</div>
+      <div class="q">"Experience with medical device usability testing?"</div>
+      <div class="ans">AI draft answer: <span class="tag t-part">PARTIAL</span></div>
+      <div class="ev"><strong>Evidence:</strong> usability testing appears in HCI coursework and Human Factors projects; no profile entry mentions medical devices. The AI will not answer "Yes" without that evidence.</div>
+      <div class="row"><button class="btn" type="button" id="ev-edit">Edit</button><button class="btn apply" type="button" id="ev-ok">Confirm</button></div>
+    </div>
+  </section>
+
+  <section id="automation">
+    <div class="sec-head">
+      <div class="eyebrow">Levels of automation</div>
+      <div>
+        <h2>The user chooses how much the agent does.</h2>
+        <p>Grounded in automation-design research: more autonomy for repetitive steps, with the approval gate fixed in place at every level.</p>
+      </div>
+    </div>
+    <div class="levels">
+      <div class="level"><h3>Manual</h3><div class="meter"><i class="on"></i><i></i><i></i></div><ul><li>AI finds jobs</li><li>User swipes</li><li>User applies manually</li></ul><div class="gate">✓ Human submits</div></div>
+      <div class="level"><h3>Assisted</h3><div class="meter"><i class="on"></i><i class="on"></i><i></i></div><ul><li>AI tailors resume &amp; cover letter</li><li>AI fills the application</li><li>User reviews</li></ul><div class="gate">✓ Human submits</div></div>
+      <div class="level"><h3>Autopilot</h3><div class="meter"><i class="on"></i><i class="on"></i><i class="on"></i></div><ul><li>User sets rules — e.g. match &gt;85%, salary &gt;$70k, Human Factors, Phoenix or remote, no relocation</li><li>AI prepares qualifying applications</li></ul><div class="gate">✓ Human approves each one</div></div>
+    </div>
+  </section>
+
+  <section id="roadmap">
+    <div class="sec-head">
+      <div class="eyebrow">MVP roadmap</div>
+      <div>
+        <h2>Four versions, safest value first.</h2>
+        <p>Job discovery, matching and application preparation come before automated submission, which carries the most terms-of-service, CAPTCHA and anti-bot risk.</p>
+      </div>
+    </div>
+    <div class="road">
+      <div class="ver next"><div class="v">VERSION 1</div><h3>Resume &amp; matching</h3><ul><li>Resume upload &amp; extraction</li><li>User-verified profile</li><li>Paste a job, get an explained score</li><li>Tailored resume + cover letter</li></ul><div class="st">NEXT UP</div></div>
+      <div class="ver"><div class="v">VERSION 2</div><h3>Job discovery</h3><ul><li>Job database</li><li>Swipe cards</li><li>Search &amp; filters</li><li>Save / pass / apply</li></ul><div class="st later">PLANNED</div></div>
+      <div class="ver"><div class="v">VERSION 3</div><h3>Application assistant</h3><ul><li>Field filling</li><li>Resume &amp; letter upload</li><li>Question assistance</li><li>Human verification</li></ul><div class="st later">PLANNED</div></div>
+      <div class="ver"><div class="v">VERSION 4</div><h3>Career agent</h3><ul><li>"Find me 10 Human Factors jobs this week paying $75k+."</li><li>Search → analyze → explain → prepare</li></ul><div class="st later">PLANNED</div></div>
+    </div>
+  </section>
+
+  <section id="stack">
+    <div class="sec-head">
+      <div class="eyebrow">Proposed architecture</div>
+      <div><h2>Built around permitted access and structured AI output.</h2></div>
+    </div>
+    <div class="stack">
+      <div><div class="k">Frontend</div><div class="v">React Native / Expo or Flutter</div></div>
+      <div><div class="k">Backend</div><div class="v">Python · FastAPI · PostgreSQL</div></div>
+      <div><div class="k">AI</div><div class="v">LLM API · embeddings / RAG · structured outputs</div></div>
+      <div><div class="k">Job data</div><div class="v">Authorized APIs &amp; feeds · posting parser</div></div>
+      <div><div class="k">Automation</div><div class="v">Playwright · human-in-the-loop agent</div></div>
+      <div><div class="k">Auth</div><div class="v">Auth0, Clerk or Supabase</div></div>
+    </div>
+  </section>
+
+  <section id="study">
+    <div class="sec-head">
+      <div class="eyebrow">Planned usability study</div>
+      <div>
+        <h2>How success will be measured.</h2>
+        <p>The prototype will be evaluated against a conventional job-search workflow. No results yet — these are the measures the study is designed around.</p>
+      </div>
+    </div>
+    <div class="measures">
+      <div class="measure">Time to find a relevant job</div>
+      <div class="measure">Applications completed</div>
+      <div class="measure">Cognitive workload</div>
+      <div class="measure">Irrelevant jobs viewed</div>
+      <div class="measure">Application completion time</div>
+      <div class="measure">Error rate</div>
+      <div class="measure">Trust in AI recommendations</div>
+      <div class="measure">User satisfaction</div>
+    </div>
+    <div class="skills-shown" aria-label="Skills this project demonstrates">
+      <span>User-centered design</span><span>Human–AI interaction</span><span>Decision support</span><span>Automation design</span><span>Usability testing</span><span>Data analysis</span><span>Product development</span>
+    </div>
+  </section>
+
+  <section id="log">
+    <div class="sec-head">
+      <div class="eyebrow">Progress log</div>
+      <div><h2>Where the project stands.</h2></div>
+    </div>
+    <div class="body-grid">
+      <div></div>
+      <ol class="log">
+        <li class="done-i"><div class="d">Sept 20, 2026</div><div class="t">Concept defined</div><div class="s">Product vision, core philosophy, ten core features, match-score design, automation levels and MVP plan documented.</div></li>
+        <li class="done-i"><div class="d">Sept 20, 2026</div><div class="t">Project workspace set up</div><div class="s">Requirements and guardrails captured as project instructions; role-based workstreams planned (PM, UX, AI, frontend, backend, UX research, security).</div></li>
+        <li class="done-i"><div class="d">Sept 22, 2026</div><div class="t">Case study page published</div><div class="s">This page, including the interactive job-card prototype above.</div></li>
+        <li><div class="d">Next</div><div class="t">Clickable prototype</div><div class="s">Home → profile → job card → match analysis → tailored resume &amp; letter → review → confirmation.</div></li>
+        <li><div class="d">Then</div><div class="t">Version 1 build &amp; first usability sessions</div></li>
+      </ol>
+    </div>
+  </section>
+
+  <footer>
+    <span>KruzzConnect · a Human Systems Engineering portfolio project by Kevin Cruz</span>
+    <span>Jobs, companies and scores on this page are illustrative examples.</span>
+  </footer>
+</div>
+
+<script>
+(function(){
+  const W = [
+    ["Required qualifications", 40],["Preferred qualifications", 20],["Relevant experience", 15],
+    ["Technical skills", 10],["Education", 10],["Other requirements", 5]
+  ];
+  document.getElementById('weights').innerHTML = W.map(([n,p]) =>
+    `<div class="w-row"><span>${n}</span><div class="w-bar"><i style="width:${p/40*100}%"></i></div><span class="pct">${p}%</span></div>`).join('');
+
+  // Sample jobs. Score = sum(category fraction × weight) so the number always matches its explanation.
+  const jobs = [
+    { role:"Human Factors Engineer", co:"Example MedTech Co.", pay:"$82k–$115k", loc:"Phoenix, AZ", mode:"Hybrid",
+      cat:[.80,.50,.70,.50,1,1],
+      reqs:[["Engineering degree","yes"],["Human factors experience","yes"],["Usability testing","yes"],["Risk analysis","part"],["Medical device experience","no"],["MATLAB","no"]],
+      why:"Strong on human factors, HCI and usability. Gaps: medical devices, MATLAB." },
+    { role:"UX Researcher", co:"Example Software Inc.", pay:"$78k–$104k", loc:"Remote (US)", mode:"Remote",
+      cat:[.90,.75,.70,.80,1,1],
+      reqs:[["User research methods","yes"],["Usability testing","yes"],["Survey design","yes"],["SQL / data analysis","yes"],["3+ years in industry","part"]],
+      why:"Research and data skills are well evidenced. Partial: years of industry experience." },
+    { role:"Manufacturing Engineer", co:"Example Aerospace Ltd.", pay:"$74k–$96k", loc:"Tempe, AZ", mode:"On-site",
+      cat:[.35,.20,.30,.40,1,.6],
+      reqs:[["Engineering degree","yes"],["Lean / Six Sigma","no"],["CAD (SolidWorks)","no"],["Process improvement","part"],["Shop-floor experience","no"]],
+      why:"Degree matches, but most manufacturing requirements have no supporting evidence." }
+  ];
+  jobs.forEach(j => j.score = Math.round(j.cat.reduce((s,f,i)=>s+f*W[i][1],0)));
+
+  const deck = document.getElementById('deck'), toast = document.getElementById('toast');
+  let idx = 0;
+  const tagTxt = {yes:"MATCH",part:"PARTIAL",no:"GAP"};
+  const color = s => s>=75?'var(--yes)':s>=55?'var(--part)':'var(--no)';
+
+  function cardHTML(j){
+    const C = 2*Math.PI*30, off = C*(1-j.score/100);
+    return `<div class="stamp apply">APPLY</div><div class="stamp pass">PASS</div>
+      <div class="card-head"><div><div class="role">${j.role}</div><div class="co">${j.co}</div></div>
+      <div class="ring"><svg viewBox="0 0 74 74" aria-hidden="true"><circle cx="37" cy="37" r="30" fill="none" stroke="var(--line)" stroke-width="7"/>
+      <circle cx="37" cy="37" r="30" fill="none" stroke="${color(j.score)}" stroke-width="7" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${off}"/></svg>
+      <div class="num">${j.score}%</div><div class="lbl">match</div></div></div>
+      <div class="facts"><span class="chip">${j.pay}</span><span class="chip">${j.loc}</span><span class="chip">${j.mode}</span></div>
+      <ul class="reqs">${j.reqs.map(([r,t])=>`<li><span>${r}</span><span class="tag t-${t}">${tagTxt[t]}</span></li>`).join('')}</ul>
+      <div class="why"><strong>Why ${j.score}%:</strong> ${j.why}</div>`;
+  }
+
+  function render(){
+    deck.innerHTML = '';
+    if(idx >= jobs.length){
+      deck.innerHTML = `<div class="done"><div><strong>That's the sample stack.</strong><br>In the app, the agent keeps finding jobs that fit your preferences.<br><br><button class="btn" type="button" id="restart">Start over</button></div></div>`;
+      document.getElementById('restart').onclick = () => { idx = 0; render(); toast.textContent = "Every score shows its reasons."; };
+      return;
+    }
+    for(let k = Math.min(idx+1, jobs.length-1); k >= idx; k--){
+      const el = document.createElement('article');
+      el.className = 'card' + (k>idx?' behind':'');
+      el.innerHTML = cardHTML(jobs[k]);
+      el.setAttribute('aria-label', `${jobs[k].role}, ${jobs[k].score} percent match`);
+      deck.appendChild(el);
+      if(k===idx) attachDrag(el);
+    }
+  }
+
+  function decide(action){
+    const top = deck.querySelector('.card:not(.behind)'); if(!top) return;
+    const j = jobs[idx];
+    const dx = action==='apply'?600:action==='pass'?-600:0, dy = action==='save'?-600:0;
+    top.style.transform = `translate(${dx}px,${dy}px) rotate(${dx/30}deg)`; top.style.opacity = 0;
+    toast.textContent = action==='apply' ? `Applying to ${j.role}: the agent drafts a tailored resume and letter, then waits for your review. Nothing is submitted without you.`
+      : action==='save' ? `Saved ${j.role} for later.` : `Passed on ${j.role}. KruzzConnect will ask before changing your preferences based on this.`;
+    idx++; setTimeout(render, 300);
+  }
+
+  function attachDrag(el){
+    let sx=0, sy=0, dx=0, active=false;
+    const st = el.querySelectorAll('.stamp');
+    el.addEventListener('pointerdown', e => { if(e.button!==undefined && e.button!==0) return; active=true; sx=e.clientX; sy=e.clientY; dx=0; el.classList.add('dragging'); el.setPointerCapture(e.pointerId); });
+    el.addEventListener('pointermove', e => {
+      if(!active) return; dx = e.clientX-sx; const dy = (e.clientY-sy)*.2;
+      el.style.transform = `translate(${dx}px,${dy}px) rotate(${dx/20}deg)`;
+      st[0].style.opacity = Math.max(0, Math.min(1, dx/100)); st[1].style.opacity = Math.max(0, Math.min(1, -dx/100));
+    });
+    const end = () => { if(!active) return; active=false; el.classList.remove('dragging');
+      if(dx>110) decide('apply'); else if(dx<-110) decide('pass');
+      else { el.style.transform=''; st.forEach(s=>s.style.opacity=0); if(Math.abs(dx)<5) toast.textContent = `Why ${jobs[idx].score}%? ${jobs[idx].why} Category weights are listed under "Match scoring" below.`; } };
+    el.addEventListener('pointerup', end); el.addEventListener('pointercancel', end);
+  }
+
+  document.getElementById('b-pass').onclick = () => decide('pass');
+  document.getElementById('b-save').onclick = () => decide('save');
+  document.getElementById('b-apply').onclick = () => decide('apply');
+  document.addEventListener('keydown', e => { if(e.target.closest('input,textarea')) return; if(e.key==='ArrowLeft') decide('pass'); if(e.key==='ArrowRight') decide('apply'); });
+  document.getElementById('ev-ok').onclick = e => { e.target.textContent = 'Confirmed ✓'; };
+  document.getElementById('ev-edit').onclick = e => { e.target.textContent = 'Editing…'; };
+  render();
+})();
+</script>
+</body>
+</html>
